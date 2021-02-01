@@ -1,7 +1,7 @@
 
 
 
-from flask import Flask, render_template, url_for, request, flash, session, redirect, abort, g
+from flask import Flask, render_template, url_for, request, flash, session, redirect, abort, g, make_response
 # url_for - позволяет генерировать url-адрес по имени функции обработчика
 import sqlite3
 import os
@@ -17,9 +17,10 @@ SECRET_KEY = 'dsad23daefd23fsef45'
 app = Flask(__name__)
 # app.config['SECRET_KEY'] = 'hdsfksjhfjdshfjsdhflsdhf3jfi'
 #
-# menu = [{'name': 'Installing', 'url': 'install-flask'},
-#         {'name': 'First app', 'url': 'first-app'},
-#         {'name': 'Contacts', 'url': 'contact'}]
+menu = [{'name': 'Installing', 'url': 'install-flask'},
+        {'name': 'First app', 'url': 'first-app'},
+        {'name': 'Contacts', 'url': 'contact'}]
+
 app.config.from_object(__name__)
 app.config.update(dict(DATABASE=os.path.join(app.root_path, 'flsite.db')))
 
@@ -60,6 +61,34 @@ def index():
     dbase = FDataBase(db)
     # print(url_for('index'))
     return render_template('index.html', menu=dbase.get_menu(), posts=dbase.get_posts_anonce())
+
+
+@app.route('/html_text')
+def html_text():
+    content = render_template('index.html', menu=menu, posts=[])
+    res = make_response(content)
+    res.headers['Content-Type'] = 'text/plain'
+    res.headers['Server'] = 'flask_site_v.1'
+    return res
+
+
+@app.route('/img')
+def img():
+    img = None
+    with app.open_resource( app.root_path + '/static/images/default.png', mode='rb') as f:
+        img = f.read()
+
+    if img is None:
+        return "None image"
+    res = make_response(img)
+    res.headers['Content-Type'] = 'image/png'
+    return res
+
+
+@app.route('/error500')
+def error500():
+    res = make_response("<h1>Server error</h1>", 500)
+    return res
 
 
 @app.route("/add_post", methods=["POST", "GET"])
@@ -136,12 +165,18 @@ def show_post(alias):
 #     return render_template('login.html', title='Autorization', menu=menu)
 #
 #
-# @app.errorhandler(404)
-# def page_not_found(error):
-#     return render_template('page404.html', title="Page not found", menu=menu), 404
-#
-#
-#
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('page404.html', title="Page not found", menu=menu), 404
+
+
+@app.route('/transfer')
+def transfer():
+    return redirect(url_for('index'), 301)
+
+
+
+
 # # with app.test_request_context():
 # #     print(url_for('index'))
 # #     print(url_for('about'))

@@ -1,0 +1,34 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<!--&lt;!&ndash;    <meta charset="UTF-8">&ndash;&gt;-->
+<!--    &lt;!&ndash; {...} Разметка шаблонов с модулем Jinja2-->
+<!--    https://www.youtube.com/watch?v=cFJqMXxVNsI&list=PLA0M1Bcd0w8wfmtElObQrBbZjY6XeA06U &ndash;&gt;-->
+<link type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet" />
+{% block title -%}
+{% if title %}
+    <title>Про Flask - {{ title }}</title>
+{% else %}
+    <title>Про Flask</title>
+{% endif %}
+{% endblock %}
+</head>
+<body>
+{% block content -%}
+    {%- block mainmenu -%}
+<ul class="mainmenu">
+<li><a href="{{ url_for('index') }}">Main</a></li>
+<li><a href="{{ url_for('add_post') }}">Add post</a></li>
+</ul>
+    {% endblock mainmenu -%}
+<div class="clear"></div>
+<div class="content">
+    {% if title -%}
+<h1>{{ title }}</h1>
+    {% else -%}
+<h1>Про Flask</h1>
+    {% endif -%}
+{% endblock -%}
+</div>
+</body>
+</html>
